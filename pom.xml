@@ -52,6 +52,11 @@
             <artifactId>hadoop-core</artifactId>
             <version>0.20.2-CDH3B4</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>r09</version>
+        </dependency>
     </dependencies>
 
 

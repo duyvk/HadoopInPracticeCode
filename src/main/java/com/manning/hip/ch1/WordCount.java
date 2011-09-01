@@ -3,6 +3,8 @@ package com.manning.hip.ch1;
 //<start id="ch01-01"/>
 
 import java.io.IOException;
+import com.google.common.io.Files;
+import java.io.File;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -24,8 +26,10 @@ public class WordCount extends Configured implements Tool {
 
   @Override
   public int run(String[] args) throws Exception {
-    String testData = "test-data/moby-dick.txt";
-    String outputPath = "test-output";
+    String testData = "test-data/ch1/moby-dick.txt";
+    String outputPath = "test-output/ch1";
+    // for tests to work consistently 
+    Files.deleteRecursively(new File(outputPath)); 
     Job job = new Job(getConf());
     job.setJarByClass(WordCount.class);
     job.setJobName("WordCount");
