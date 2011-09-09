@@ -28,7 +28,9 @@ public class WordCount extends Configured implements Tool {
     String testData = "test-data/ch1/moby-dick.txt";
     String outputPath = "test-output/ch1";
     if (new File(outputPath).exists()) //<co id="ch01_comment2" />
-      Files.deleteRecursively(new File(outputPath)); 
+    {
+      Files.deleteRecursively(new File(outputPath));
+    }
     Job job = new Job(getConf());
     job.setJarByClass(WordCount.class); //<co id="ch01_comment3" />
     job.setJobName("WordCount");
@@ -56,7 +58,7 @@ public class WordCount extends Configured implements Tool {
   }
 
   public static class Map
-    extends Mapper<LongWritable, Text, Text, IntWritable> {
+          extends Mapper <LongWritable, Text, Text, IntWritable> {
 
     @Override
     public void map(LongWritable key, Text value, Context context)
