@@ -58,7 +58,7 @@ public class WordCount extends Configured implements Tool {
   }
 
   public static class Map
-          extends Mapper <LongWritable, Text, Text, IntWritable> {
+          extends Mapper<LongWritable, Text, Text, IntWritable> {
 
     @Override
     public void map(LongWritable key, Text value, Context context)
@@ -79,7 +79,8 @@ public class WordCount extends Configured implements Tool {
           extends Reducer<Text, IntWritable, Text, IntWritable> {
 
     @Override
-    public void reduce(Text key, Iterable<IntWritable> values, Context context)
+    public void reduce(
+            Text key, Iterable<IntWritable> values, Context context)
             throws IOException, InterruptedException {
       int sum = 0;
       for (IntWritable val : values) { //<co id="ch01_comment6" />
