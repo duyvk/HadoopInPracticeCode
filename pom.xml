@@ -37,12 +37,13 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
-            <plugin>
+            <plugin>                
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>fully.qualified.MainClass</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>com.manning.hip.ch1.WordCount</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -60,7 +61,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>4.9</version>
             <scope>test</scope>
         </dependency>
         <dependency>
