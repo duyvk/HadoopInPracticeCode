@@ -2,6 +2,7 @@ package com.manning.hip.ch1.hadoop21;
 
 import com.google.common.io.Files;
 import java.io.File;
+import java.nio.charset.Charset;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -16,7 +17,6 @@ public class WordCountTest {
   @BeforeClass
   public static void setupBase() throws Exception {
     System.out.println("hadoop21.setupBase");
-
     if (new File(outputPath).exists()) //<co id="ch01_comment2" />
     {
       Files.deleteRecursively(new File(outputPath));
@@ -32,5 +32,8 @@ public class WordCountTest {
     args[1] = outputPath;
     WordCount.main(args);
     assert (new File(outputPath + "/_SUCCESS").exists());
+    assert (Files.readLines(new File(outputPath + "/part-r-00000"),
+            Charset.defaultCharset()).
+            size() == 19545);
   }
 }

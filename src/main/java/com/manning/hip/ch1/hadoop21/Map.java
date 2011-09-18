@@ -18,7 +18,7 @@ public class Map
   @Override
   public void map(LongWritable key, Text value, Context context)
           throws IOException, InterruptedException {
-    String line = value.toString();
+    String line = value.toString();    
     String[] words = line.split("\\W"); //<co id="ch01_comment4" />
     for (String word : words) {
       if (word.trim().length() > 0) {

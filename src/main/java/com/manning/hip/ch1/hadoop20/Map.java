@@ -25,8 +25,7 @@ public class Map
     String[] tokens = line.split("\\W"); //<co id="ch01_comment4" />
     for (String token : tokens) {
       if (token.trim().length() > 0) {
-        Text text = new Text();
-        text.set(word);
+        word.set(token);
         output.collect(word, ONE); //<co id="ch01_comment5" />
       }
     }
