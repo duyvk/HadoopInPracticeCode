@@ -1,0 +1,24 @@
+You = 64-bit RedHat
+Me = 32-bit Ubuntu
+
+You: yum install hadoop-0.20-native.x86_64
+Me: sudo apt-get install hadoop-0.20-native
+
+You: yum install liblzo-devel
+Me: sudo apt-get install liblzo2-dev
+
+You: Download Todd Lipcon' s LZO code f rom
+https://github.com/toddlipcon/hadoop-lzo
+Me: 
+git clone https://github.com/toddlipcon/hadoop-lzo.git
+cd hadoop-lzo
+ant package
+To install the jar into your local mvn repository
+mvn install:install-file -Dfile=build/hadoop-lzo-0.4.14/hadoop-lzo-0.4.14.jar -DgroupId=com.hadoop.compression.lzo -DartifactId=hadoop-lzo -Dversion=0.4.14 -Dpackaging=jar
+
+You: cp build/hadoop-lzo-0.4.10/lib/native/Linux-amd64-64/* \
+/usr/lib/hadoop/lib/native/Linux-amd64-64/
+Me: sudo cp build/hadoop-lzo-0.4.14/lib/native/Linux-i386-32/* /usr/lib/hadoop/lib/native/Linux-i386-32/
+
+To install the jar into your local mvn repository
+mvn install:install-file -Dfile=build/hadoop-lzo-0.4.14/hadoop-lzo-0.4.14.jar -DgroupId=com.hadoop.compression.lzo -DartifactId=hadoop-lzo -Dversion=0.4.14 -Dpackaging=jar

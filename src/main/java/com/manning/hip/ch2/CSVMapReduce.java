@@ -13,7 +13,7 @@ import java.io.IOException;
 
 public final class CSVMapReduce {
   public static class Map extends Mapper<LongWritable, ArrayWritable, //<co id="ch02_comment_csv_mr1"/>
-      Text, Text> {
+      LongWritable, Text> {
 
     @Override
     protected void map(LongWritable key, ArrayWritable value,
@@ -22,8 +22,7 @@ public final class CSVMapReduce {
         IOException, InterruptedException {
 
       String[] tokens = value.toStrings();
-      context.write(                       //<co id="ch02_comment_csv_mr2"/>
-          new Text(tokens[0]),
+      context.write(key,                                //<co id="ch02_comment_csv_mr2"/>
           new Text(StringUtils.join(tokens, ",")));
     }
   }
@@ -40,12 +39,9 @@ public final class CSVMapReduce {
 
     Job job = new Job(conf);
     job.setJarByClass(CSVMapReduce.class);
-    job.setOutputKeyClass(Text.class);
-    job.setOutputValueClass(Text.class);
     job.setMapperClass(Map.class);
     job.setInputFormatClass(CSVInputFormat.class); //<co id="ch02_comment_csv_mr4"/>
     job.setNumReduceTasks(0);
-    job.setOutputFormatClass(TextOutputFormat.class);
 
     FileInputFormat.setInputPaths(job, new Path(input));
     Path outPath = new Path(output);

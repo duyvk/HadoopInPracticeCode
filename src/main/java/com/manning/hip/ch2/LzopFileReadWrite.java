@@ -42,29 +42,8 @@ public class LzopFileReadWrite {
 
       IOUtils.copyBytes(is, os, config);
     } finally {
-      IOUtils.cleanup(null, os);
-      IOUtils.cleanup(null, is);
-    }
-    return destFile;
-  }
-
-  public static Path write(Path src,
-                           Configuration config, byte[] content)
-      throws IOException {
-    Path destFile =
-        new Path(
-            src.toString() + new LzopCodec().getDefaultExtension());
-
-    LzopCodec codec = new LzopCodec();
-    codec.setConf(config);
-
-    FileSystem hdfs = FileSystem.get(config);
-    OutputStream os = null;
-    try {
-      os = codec.createOutputStream(hdfs.create(destFile));
-      os.write(content);
-    } finally {
-      IOUtils.cleanup(null, os);
+      IOUtils.closeStream(os);
+      IOUtils.closeStream(is);
     }
     return destFile;
   }
@@ -84,10 +63,8 @@ public class LzopFileReadWrite {
 
       IOUtils.copyBytes(is, os, config);
     } finally {
-      IOUtils.cleanup(null, os);
-      IOUtils.cleanup(null, is);
+      IOUtils.closeStream(os);
+      IOUtils.closeStream(is);
     }
   }
-
-
 }

@@ -11,9 +11,7 @@ import java.io.IOException;
 
 /**
  * An {@link org.apache.hadoop.mapreduce.InputFormat} for CSV
- * plain text files.  Files are broken into lines, and each token
- * in each line can be transformed in a custom fashion by supplying
- * a {@link CSVLineTokenTransformer}.  Keys are byte offsets in
+ * plain text files.  Keys are byte offsets in
  * the file, and values are {@link ArrayWritable}'s with tokenized
  * values.
  */
@@ -30,20 +28,12 @@ public class CSVInputFormat extends
     String csvDelimiter = context.getConfiguration().get( //<co id="ch02_comment_csv_inputformat1"/>
         CSV_TOKEN_SEPARATOR_CONFIG);
 
-    String transformerClass = context.getConfiguration().get(
-        "csvinputformat.tranformer.class");
-    CSVLineTokenTransformer transformer = null;
-    if (null != transformerClass) {
-      try {
-        transformer =                      //<co id="ch02_comment_csv_inputformat2"/>
-            (CSVLineTokenTransformer) Class.forName(transformerClass)
-                .newInstance();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
+    Character separator = null;
+    if(csvDelimiter != null && csvDelimiter.length() == 1) {
+      separator = csvDelimiter.charAt(0);
     }
 
-    return new CSVRecordReader(csvDelimiter, transformer);
+    return new CSVRecordReader(separator);             //<co id="ch02_comment_csv_inputformat2"/>
   }
 
   @Override
@@ -56,18 +46,16 @@ public class CSVInputFormat extends
 
   public static class CSVRecordReader              //<co id="ch02_comment_csv_inputformat4"/>
       extends RecordReader<LongWritable, ArrayWritable> {
-    public final static String DEFAULT_CSV_DELIMITER = ",";
-    private CSVLineTokenTransformer transformer;
     private LineRecordReader reader;
     private ArrayWritable value;
-    private String csvDelimiter = DEFAULT_CSV_DELIMITER;
+    private final CSVParser parser;
 
-    public CSVRecordReader(String csvDelimiter,
-                           CSVLineTokenTransformer transformer) {
+    public CSVRecordReader(Character csvDelimiter) {
       this.reader = new LineRecordReader();
-      this.transformer = transformer;
-      if (csvDelimiter != null) {
-        this.csvDelimiter = csvDelimiter;
+      if (csvDelimiter == null) {
+        parser = new CSVParser();             //<co id="ch02_comment_csv_inputformat5"/>
+      } else {
+        parser = new CSVParser(csvDelimiter);
       }
     }
 
@@ -75,14 +63,14 @@ public class CSVInputFormat extends
     public void initialize(InputSplit split,
                            TaskAttemptContext context)
         throws IOException, InterruptedException {
-      reader.initialize(split, context);     //<co id="ch02_comment_csv_inputformat5"/>
+      reader.initialize(split, context);     //<co id="ch02_comment_csv_inputformat6"/>
     }
 
     @Override
     public boolean nextKeyValue()
         throws IOException, InterruptedException {
-      if (reader.nextKeyValue()) {       //<co id="ch02_comment_csv_inputformat6"/>
-        loadCSV();                        //<co id="ch02_comment_csv_inputformat7"/>
+      if (reader.nextKeyValue()) {       //<co id="ch02_comment_csv_inputformat7"/>
+        loadCSV();                        //<co id="ch02_comment_csv_inputformat8"/>
         return true;
       } else {
         value = null;
@@ -90,26 +78,20 @@ public class CSVInputFormat extends
       }
     }
 
-    private void loadCSV() {            //<co id="ch02_comment_csv_inputformat8"/>
+    private void loadCSV() throws IOException {            //<co id="ch02_comment_csv_inputformat9"/>
       String line = reader.getCurrentValue().toString();
-      String[] tokens =
-          StringUtils.splitPreserveAllTokens(line, csvDelimiter);   //<co id="ch02_comment_csv_inputformat9"/>
-      if (transformer != null) {
-        for (int i = 0; i < tokens.length; i++) {
-          tokens[i] = transformer.transform(line, i, tokens[i]);
-        }
-      }
+      String[] tokens = parser.parseLine(line);            //<co id="ch02_comment_csv_inputformat10"/>
       value = new ArrayWritable(tokens);
     }
 
     @Override
-    public LongWritable getCurrentKey()      //<co id="ch02_comment_csv_inputformat10"/>
+    public LongWritable getCurrentKey()      //<co id="ch02_comment_csv_inputformat11"/>
         throws IOException, InterruptedException {
       return reader.getCurrentKey();
     }
 
     @Override
-    public ArrayWritable getCurrentValue()    //<co id="ch02_comment_csv_inputformat11"/>
+    public ArrayWritable getCurrentValue()    //<co id="ch02_comment_csv_inputformat12"/>
         throws IOException, InterruptedException {
       return value;
     }
@@ -125,9 +107,4 @@ public class CSVInputFormat extends
       reader.close();
     }
   }
-
-  public static interface CSVLineTokenTransformer {
-    String transform(String line, int tokenIdx, String token);
-  }
-
 }

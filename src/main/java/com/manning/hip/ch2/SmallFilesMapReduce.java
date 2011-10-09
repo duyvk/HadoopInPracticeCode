@@ -11,9 +11,6 @@ import java.nio.ByteBuffer;
 
 public class SmallFilesMapReduce {
 
-  /**
-   * Uses default mapper with no reduces for a map-only identity job.
-   */
   @SuppressWarnings("deprecation")
   public static void main(String... args) throws Exception {
     JobConf job = new JobConf();
@@ -23,11 +20,11 @@ public class SmallFilesMapReduce {
 
     output.getFileSystem(job).delete(output);
 
-    AvroJob.setInputSchema(job, SmallFilesWrite.SCHEMA);
+    AvroJob.setInputSchema(job, SmallFilesWrite.SCHEMA);   //<co id="ch02_smallfilemr_comment1"/>
 
     job.setOutputFormat(TextOutputFormat.class);
 
-    AvroJob.setMapperClass(job, Mapper.class);
+    AvroJob.setMapperClass(job, Mapper.class);             //<co id="ch02_smallfilemr_comment2"/>
     FileInputFormat.setInputPaths(job, input);
     FileOutputFormat.setOutputPath(job, output);
 
@@ -37,19 +34,17 @@ public class SmallFilesMapReduce {
   }
 
   public static class Mapper
-      extends AvroMapper<GenericRecord, Pair<Void, Void>> {
+      extends AvroMapper<GenericRecord, Pair<Void, Void>> { //<co id="ch02_smallfilemr_comment3"/>
     @Override
     public void map(GenericRecord r,
                     AvroCollector<Pair<Void, Void>> collector,
                     Reporter reporter) throws IOException {
-      System.out.println(
-          r.get(SmallFilesWrite.FIELD_FILENAME) +
-              ": " +
-              DigestUtils.md5Hex(
-                  ((ByteBuffer) r.get(SmallFilesWrite.FIELD_CONTENTS))
-                      .array()));
+      String filename = (String)
+        r.get(SmallFilesWrite.FIELD_FILENAME);    //<co id="ch02_smallfilemr_comment4"/>
+      String md5 = DigestUtils.md5Hex(
+            ((ByteBuffer) r.get(SmallFilesWrite.FIELD_CONTENTS))
+              .array());
+      System.out.println(filename + ": " + md5);
     }
   }
-
-
 }

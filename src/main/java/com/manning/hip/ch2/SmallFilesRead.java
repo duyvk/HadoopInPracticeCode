@@ -17,12 +17,12 @@ public class SmallFilesRead {
   private static final String FIELD_CONTENTS = "contents";
 
   public static void readFromAvro(InputStream is) throws IOException {
-    DataFileStream<Object> reader =
+    DataFileStream<Object> reader =                   //<co id="ch02_smallfileread_comment1"/>
         new DataFileStream<Object>(
             is, new GenericDatumReader<Object>());
-    for (Object o : reader) {
-      GenericRecord r = (GenericRecord) o;
-      System.out.println(
+    for (Object o : reader) {                         //<co id="ch02_smallfileread_comment2"/>
+      GenericRecord r = (GenericRecord) o;            //<co id="ch02_smallfileread_comment3"/>
+      System.out.println(                             //<co id="ch02_smallfileread_comment4"/>
           r.get(FIELD_FILENAME) +
               ": " +
               DigestUtils.md5Hex(
