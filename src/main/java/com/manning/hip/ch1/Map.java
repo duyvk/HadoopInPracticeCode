@@ -1,3 +1,4 @@
+//<start id="ch01-03"/>
 package com.manning.hip.ch1;
 
 import java.io.IOException;
@@ -9,18 +10,17 @@ import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
-/**
- *
- * @author mark
- */
 public class Map
-        extends MapReduceBase implements Mapper<LongWritable, Text, Text, IntWritable> {
+        extends MapReduceBase
+        implements Mapper<LongWritable, Text, Text, IntWritable> {
 
   private static IntWritable ONE = new IntWritable(1); //<co id="ch01_comment1" />
   private Text word = new Text();
 
   @Override
-  public void map(LongWritable key, Text value, OutputCollector<Text, IntWritable> output, Reporter reporter) throws IOException {
+  public void map(LongWritable key, Text value,
+          OutputCollector<Text, IntWritable> output, Reporter reporter)
+          throws IOException {
     String line = value.toString();
     String[] tokens = line.split("\\W"); //<co id="ch01_comment4" />
     for (String token : tokens) {
@@ -30,4 +30,4 @@ public class Map
       }
     }
   }
-}
+}//<end id="ch01-03"/>

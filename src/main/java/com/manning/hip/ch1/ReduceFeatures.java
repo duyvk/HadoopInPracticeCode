@@ -1,4 +1,4 @@
-//<start id="ch01-02"/>
+//<start id="ch01-08"/>
 package com.manning.hip.ch1;
 
 import java.io.IOException;
@@ -10,7 +10,7 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 
-public class Reduce
+public class ReduceFeatures
         extends MapReduceBase
         implements Reducer<Text, IntWritable, Text, IntWritable> {
 
@@ -24,4 +24,4 @@ public class Reduce
     }
     output.collect(key, new IntWritable(sum));
   }
-}//<end id="ch01-02"/>
+}//<end id="ch01-08"/>

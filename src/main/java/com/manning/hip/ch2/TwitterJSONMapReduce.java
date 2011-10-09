@@ -8,7 +8,6 @@ import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.*;
 import org.slf4j.*;
-import util.HadoopUtil;
 
 import java.io.IOException;
 
@@ -57,7 +56,7 @@ public final class TwitterJSONMapReduce {
     FileInputFormat.setInputPaths(job, new Path(input));
     Path outPath = new Path(output);
     FileOutputFormat.setOutputPath(job, outPath);
-    HadoopUtil.delete(conf, outPath);
+    outPath.getFileSystem(conf).delete(outPath, true);
 
     job.waitForCompletion(true);
   }

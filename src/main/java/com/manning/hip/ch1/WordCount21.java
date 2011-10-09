@@ -1,4 +1,4 @@
-//<start id="ch01-01"/>
+//<start id="ch01-06"/>
 package com.manning.hip.ch1;
 
 import org.apache.hadoop.conf.Configured;
@@ -18,8 +18,8 @@ public class WordCount21 extends Configured implements Tool {
   @Override
   public int run(String[] args) throws Exception {
     Job job = new Job(getConf());
-    job.setJarByClass(WordCount21.class); //<co id="ch01_comment3" />
-    job.setJobName("WordCount");
+    job.setJarByClass(WordCount21.class); 
+    job.setJobName("WordCount21");
 
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(IntWritable.class);
@@ -45,4 +45,4 @@ public class WordCount21 extends Configured implements Tool {
     }
   }
 }
-//<end id="ch01-01"/>
+//<end id="ch01-06"/>

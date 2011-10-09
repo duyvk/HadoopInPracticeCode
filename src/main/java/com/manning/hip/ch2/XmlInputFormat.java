@@ -50,7 +50,8 @@ public class XmlInputFormat extends TextInputFormat {
   }
 
   /**
-   * XMLRecordReader class to read through a given xml document to output xml blocks as records as specified
+   * XMLRecordReader class to read through a given xml document to
+   * output xml blocks as records as specified
    * by the start tag and end tag
    */
   public static class XmlRecordReader

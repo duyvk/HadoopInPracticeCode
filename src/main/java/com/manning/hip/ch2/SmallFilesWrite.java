@@ -17,24 +17,25 @@ public class SmallFilesWrite {
 
   public static final String FIELD_FILENAME = "filename";
   public static final String FIELD_CONTENTS = "contents";
-  private static final String SCHEMA_JSON =    //<co id="ch02_smallfilewrite_comment1"/>
-      "{\"type\": \"record\", \"name\": \"SmallFilesTest\", " +
-          "\"fields\": ["
-          + "{\"name\":\"" + FIELD_FILENAME +
-          "\", \"type\":\"string\"},"
-          + "{\"name\":\"" + FIELD_CONTENTS +
-          "\", \"type\":\"bytes\"}]}";
+  private static final String SCHEMA_JSON = //<co id="ch02_smallfilewrite_comment1"/>
+          "{\"type\": \"record\", \"name\": \"SmallFilesTest\", "
+          + "\"fields\": ["
+          + "{\"name\":\"" + FIELD_FILENAME
+          + "\", \"type\":\"string\"},"
+          + "{\"name\":\"" + FIELD_CONTENTS
+          + "\", \"type\":\"bytes\"}]}";
   public static final Schema SCHEMA = Schema.parse(SCHEMA_JSON);
 
   public static void writeToAvro(File srcPath,
-                                 OutputStream outputStream)
-      throws IOException {
+          OutputStream outputStream)
+          throws IOException {
     DataFileWriter<Object> writer =
-        new DataFileWriter<Object>(new GenericDatumWriter<Object>())
-            .setSyncInterval(100);                 //<co id="ch02_smallfilewrite_comment2"/>
+            new DataFileWriter<Object>(new GenericDatumWriter<Object>()).setSyncInterval(100);                 //<co id="ch02_smallfilewrite_comment2"/>
     writer.setCodec(CodecFactory.snappyCodec());   //<co id="ch02_smallfilewrite_comment3"/>
     writer.create(SCHEMA, outputStream);           //<co id="ch02_smallfilewrite_comment4"/>
-    for (File file : FileUtils.listFiles(srcPath, null, false)) {
+    for (Object obj : FileUtils.listFiles(srcPath, null, false)) {
+      // MK
+      File file = (File) obj;
       String filename = file.getAbsolutePath();
       byte content[] = FileUtils.readFileToByteArray(file);
       GenericRecord record = new GenericData.Record(SCHEMA);  //<co id="ch02_smallfilewrite_comment5"/>
@@ -42,9 +43,9 @@ public class SmallFilesWrite {
       record.put(FIELD_CONTENTS, ByteBuffer.wrap(content));   //<co id="ch02_smallfilewrite_comment7"/>
       writer.append(record);                                  //<co id="ch02_smallfilewrite_comment8"/>
       System.out.println(
-          file.getAbsolutePath() +
-              ": " +
-              DigestUtils.md5Hex(content));
+              file.getAbsolutePath()
+              + ": "
+              + DigestUtils.md5Hex(content));
     }
 
     IOUtils.cleanup(null, writer);

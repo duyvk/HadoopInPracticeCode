@@ -1,6 +1,5 @@
-//<start id="ch01-01"/>
+//<start id="ch01-03"/>
 package com.manning.hip.ch1;
-
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -34,4 +33,4 @@ public class WordCount {
 
     JobClient.runJob(conf);
   }
-}//<end id="ch01-01"/>
+}//<end id="ch01-03"/>

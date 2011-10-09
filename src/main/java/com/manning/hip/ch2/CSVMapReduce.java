@@ -50,8 +50,8 @@ public final class CSVMapReduce {
     FileInputFormat.setInputPaths(job, new Path(input));
     Path outPath = new Path(output);
     FileOutputFormat.setOutputPath(job, outPath);
-    // TODO - where is this from?
-    //HadoopUtil.delete(conf, outPath);
+
+    outPath.getFileSystem(conf).delete(outPath, true);
 
     job.waitForCompletion(true);
   }

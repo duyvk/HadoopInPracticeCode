@@ -1,6 +1,5 @@
 package com.manning.hip.ch1;
 
-import com.manning.hip.ch1.WordCount;
 import com.google.common.io.Files;
 import java.io.File;
 import java.nio.charset.Charset;

@@ -1,3 +1,4 @@
+//<start id="ch01-05"/>
 package com.manning.hip.ch1;
 
 import java.io.IOException;
@@ -13,9 +14,9 @@ public class Reduce21
           Text key, Iterable<IntWritable> values, Context context)
           throws IOException, InterruptedException {
     int sum = 0;
-    for (IntWritable val : values) { //<co id="ch01_comment6" />
+    for (IntWritable val : values) { 
       sum += val.get();
     }
-    context.write(key, new IntWritable(sum)); //<co id="ch01_comment7" />
+    context.write(key, new IntWritable(sum)); 
   }
-}
+}//<end id="ch01-05"/>

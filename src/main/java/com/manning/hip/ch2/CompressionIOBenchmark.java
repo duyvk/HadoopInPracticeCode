@@ -1,9 +1,7 @@
 package com.manning.hip.ch2;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.*;
-import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.util.ReflectionUtils;
 
@@ -11,64 +9,149 @@ import java.io.*;
 
 public class CompressionIOBenchmark {
 
+  public static final String[] codecs = new String[]{
+      "org.apache.hadoop.io.compress.DeflateCodec",
+      "org.apache.hadoop.io.compress.GzipCodec",
+      "com.hadoop.compression.lzo.LzoCodec",
+      "com.hadoop.compression.lzo.LzopCodec",
+      "org.apache.hadoop.io.compress.SnappyCodec",
+      "org.apache.hadoop.io.compress.BZip2Codec"
+  };
+
   public static void main(String... args) throws Exception {
-    Configuration config = new Configuration();
 
-    Class<?> codecClass = Class.forName(args[0]);
-    CompressionCodec codec = (CompressionCodec)
-        ReflectionUtils.newInstance(codecClass, config);
+    File textSrcFile = new File(args[0]);
+    File binarySrcFile = new File(args[1]);
+    File destFile = new File(args[2]);
+    File uncompressedDestFile = new File(args[3]);
+    int runs = Integer.valueOf(args[4]);
 
-    Path srcFile = new Path(args[1]);
-    Path destFile = new Path(args[2]);
-    Path uncompressedDestFile = new Path(args[3]);
+    Configuration conf = new Configuration();
 
-    FileSystem hdfs = FileSystem.get(config);
+    for (String codec : codecs) {
+      preload(conf, codec);
+    }
 
-    long start = System.currentTimeMillis();
-    compress(srcFile, destFile, codec, config);
-    long end = System.currentTimeMillis();
-    System.out.println("Compression time = " + (end - start) +
-        "ms, compressed file size = " +
-        hdfs.getFileStatus(destFile).getLen());
+    dumpHeader();
 
-    start = System.currentTimeMillis();
-    decompress(srcFile, destFile, codec, config);
-    end = System.currentTimeMillis();
-    System.out.println("Decompression time = " + (end - start) + "ms");
+    for (String codec : codecs) {
+      test(conf, codec, textSrcFile, destFile, uncompressedDestFile, false, runs, false);
+      //test(conf, codec, binarySrcFile, destFile, uncompressedDestFile, true, runs);
+    }
+
   }
 
-  public static void compress(Path src, Path dest,
-                              CompressionCodec codec,
-                              Configuration config) throws IOException {
-    FileSystem hdfs = FileSystem.get(config);
-    InputStream is = null;
-    OutputStream os = null;
-    try {
-      is = hdfs.open(src);
-      os = codec.createOutputStream(hdfs.create(dest));
+  public static void preload(Configuration conf,
+                          String codecClazz)
+      throws ClassNotFoundException {
+    Class<?> codecClass = Class.forName(codecClazz);
+    CompressionCodec codec = (CompressionCodec)
+        ReflectionUtils.newInstance(codecClass, conf);
+  }
 
-      IOUtils.copyBytes(is, os, config);
-    } finally {
-      IOUtils.cleanup(null, os);
-      IOUtils.cleanup(null, is);
+  public static void test(Configuration conf,
+                          String codecClazz,
+                          File srcFile,
+                          File destFile,
+                          File uncompressedDestFile,
+                          boolean binary,
+                          int runs,
+                          boolean trial)
+      throws
+      ClassNotFoundException,
+      IllegalAccessException,
+      InstantiationException, IOException {
+
+    Class<?> codecClass = Class.forName(codecClazz);
+    CompressionCodec codec = (CompressionCodec)
+        ReflectionUtils.newInstance(codecClass, conf);
+
+    int accumulatedCompressMillis = 0;
+    int accumulatedDecompressMillis = 0;
+    for(int i=0; i < runs; i++) {
+      System.err.println(codecClass + " run " + (i+1) + "/" + runs);
+      long start = System.currentTimeMillis();
+      compress(srcFile, destFile, codec);
+      accumulatedCompressMillis += System.currentTimeMillis() - start;
+
+      start = System.currentTimeMillis();
+      decompress(destFile, uncompressedDestFile, codec);
+      accumulatedDecompressMillis += System.currentTimeMillis() - start;
+    }
+
+    if(!trial) {
+      dumpStats(codec,
+          runs,
+          binary,
+          accumulatedCompressMillis / runs,
+          accumulatedDecompressMillis / runs,
+          destFile.length(),
+          srcFile.length());
     }
   }
 
-  public static void decompress(Path src, Path dest,
-                                CompressionCodec codec,
-                                Configuration config)
+  public static void dumpHeader() {
+    System.out.printf("%-50s %5s %8s %12s %12s %12s %12s %11s\n",
+        "codec",
+        "runs",
+        "type",
+        "comp time",
+        "decomp time",
+        "orig size",
+        "comp size",
+        "comp per");
+
+  }
+
+  public static void dumpStats(
+      CompressionCodec codec,
+      int runs,
+      boolean binaryFile,
+      long compressionMillis,
+      long decompressionMillis,
+      long compressedFileSize,
+      long originalFileSize) {
+    System.out.printf("%-50s %5d %8s %12d %12d %12d %12d  %10.2f\n",
+        codec.getClass().getName(),
+        runs,
+        binaryFile ? "binary":"ascii",
+        compressionMillis,
+        decompressionMillis,
+        originalFileSize,
+        compressedFileSize,
+        100.0 - (double) compressedFileSize * 100 / (double) originalFileSize
+        );
+  }
+
+  public static void compress(File src, File dest,
+                              CompressionCodec codec)
       throws IOException {
-    FileSystem hdfs = FileSystem.get(config);
     InputStream is = null;
     OutputStream os = null;
     try {
-      is = codec.createInputStream(hdfs.open(src));
-      os = hdfs.create(dest);
+      is = new FileInputStream(src);
+      os = codec.createOutputStream(new FileOutputStream(dest));
 
-      IOUtils.copyBytes(is, os, config);
+      IOUtils.copy(is, os);
     } finally {
-      IOUtils.cleanup(null, os);
-      IOUtils.cleanup(null, is);
+      IOUtils.closeQuietly(os);
+      IOUtils.closeQuietly(is);
+    }
+  }
+
+  public static void decompress(File src, File dest,
+                                CompressionCodec codec)
+      throws IOException {
+    InputStream is = null;
+    OutputStream os = null;
+    try {
+      is = codec.createInputStream(new FileInputStream(src));
+      os = new FileOutputStream(dest);
+
+      IOUtils.copy(is, os);
+    } finally {
+      IOUtils.closeQuietly(os);
+      IOUtils.closeQuietly(is);
     }
   }
 }

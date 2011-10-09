@@ -1,6 +1,7 @@
 package com.manning.hip.ch2;
 
 import com.hadoop.compression.lzo.*;
+import com.hadoop.compression.lzo.LzoCodec;
 import com.hadoop.mapreduce.LzoTextInputFormat;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;

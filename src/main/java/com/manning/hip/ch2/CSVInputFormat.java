@@ -92,7 +92,8 @@ public class CSVInputFormat extends
 
     private void loadCSV() {            //<co id="ch02_comment_csv_inputformat8"/>
       String line = reader.getCurrentValue().toString();
-      String[] tokens = StringUtils.splitPreserveAllTokens(line, csvDelimiter);   //<co id="ch02_comment_csv_inputformat9"/>
+      String[] tokens =
+          StringUtils.splitPreserveAllTokens(line, csvDelimiter);   //<co id="ch02_comment_csv_inputformat9"/>
       if (transformer != null) {
         for (int i = 0; i < tokens.length; i++) {
           tokens[i] = transformer.transform(line, i, tokens[i]);
