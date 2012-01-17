@@ -1,6 +1,5 @@
-package com.manning.hip.ch1;
-
 //<start id="ch01-01"/>
+package com.manning.hip.ch1;
 
 import java.io.IOException;
 import com.google.common.io.Files;
@@ -22,16 +21,15 @@ import org.apache.hadoop.util.ToolRunner;
 
 public class WordCount extends Configured implements Tool {
 
-  private static IntWritable ONE = new IntWritable(1);
+  private static IntWritable ONE = new IntWritable(1); //<co id="ch01_comment1" />
 
   @Override
   public int run(String[] args) throws Exception {
     String testData = "test-data/ch1/moby-dick.txt";
     String outputPath = "test-output/ch1";
-    // for tests to work consistently 
-    Files.deleteRecursively(new File(outputPath)); 
+    Files.deleteRecursively(new File(outputPath)); //<co id="ch01_comment2" />
     Job job = new Job(getConf());
-    job.setJarByClass(WordCount.class);
+    job.setJarByClass(WordCount.class); //<co id="ch01_comment3" />
     job.setJobName("WordCount");
 
     job.setOutputKeyClass(Text.class);
@@ -56,34 +54,35 @@ public class WordCount extends Configured implements Tool {
     System.exit(ret);
   }
 
-  public static class Map extends Mapper<LongWritable, Text, Text, IntWritable> {
+  public static class Map
+          extends Mapper<LongWritable, Text, Text, IntWritable> {
 
     @Override
     public void map(LongWritable key, Text value, Context context)
             throws IOException, InterruptedException {
       String line = value.toString();
-      // separate the text by words
-      String[] words = line.split("\\W");
+      String[] words = line.split("\\W"); //<co id="ch01_comment4" />
       for (String word : words) {
         if (word.trim().length() > 0) {
           Text text = new Text();
           text.set(word);
-          context.write(text, ONE);
+          context.write(text, ONE); //<co id="ch01_comment5" />
         }
       }
     }
   }
 
-  public static class Reduce extends Reducer<Text, IntWritable, Text, IntWritable> {
+  public static class Reduce
+          extends Reducer<Text, IntWritable, Text, IntWritable> {
 
     @Override
     public void reduce(Text key, Iterable<IntWritable> values, Context context)
             throws IOException, InterruptedException {
       int sum = 0;
-      for (IntWritable val : values) {
+      for (IntWritable val : values) { //<co id="ch01_comment6" />
         sum += val.get();
       }
-      context.write(key, new IntWritable(sum));
+      context.write(key, new IntWritable(sum)); //<co id="ch01_comment7" />
     }
   }
 }
