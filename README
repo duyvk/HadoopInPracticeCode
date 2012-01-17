@@ -1,2 +1,8 @@
+<<<<<<< HEAD
 This project has been superseded by "Hadoop Illuminated" here:
 http://hadoopilluminated.com/
+=======
+To run
+
+JAVA_HOME=/usr/lib/jvm/jdk1.7.0 mvn -Pcloudera clean install
+>>>>>>> 872a9e5a2f7a1c32113ef1c5260d66b95d646d41
